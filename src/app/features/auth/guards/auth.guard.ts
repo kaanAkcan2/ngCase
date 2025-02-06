@@ -10,10 +10,10 @@ export const canActivate: CanActivateFn = (
     const authService = inject(AuthService);
     const router = inject(Router);
 
-    const token = authService.getToken();
+    const token = authService.getAccessToken();
 
     if (!token) {
-        // router.navigate(['/auth/login']);
+        router.navigate(['/auth/login']);
         return false;
     }
 
