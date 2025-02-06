@@ -1,12 +1,12 @@
 import { InvoiceLines } from "./invoiceLine.model";
 
 export interface Invoice {
-    id?: String;
-    customerId?: String;
-    invoiceNumber?: Number;
+    id?: string;
+    customerId?: string;
+    invoiceNumber?: number;
     invoiceDate?: Date;
-    totalAmount?: Number;
-    userId?: String;
+    totalAmount?: number;
+    userId?: string;
     recordDate?: Date;
     invoiceLines?: InvoiceLines;
 }

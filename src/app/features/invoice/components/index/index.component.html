@@ -1,1 +1,52 @@
 <h1>Index Invoice</h1>
+
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th scope="col">Customer ID</th>
+            <th scope="col">Invoice Number</th>
+            <th scope="col">Invoice Date</th>
+            <th scope="col">Total Amount</th>
+            <th scope="col">User ID</th>
+            <th scope="col">Record Date</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let invoice of invoices">
+            <td>{{ invoice.customerId }}</td>
+            <td>{{ invoice.invoiceNumber }}</td>
+            <td>{{ invoice.invoiceDate | date: 'short' }}</td>
+            <td>{{ invoice?.totalAmount | currency }}</td>
+            <td>{{ invoice.userId }}</td>
+            <td>{{ invoice.recordDate | date: 'short' }}</td>
+            <td><button class="btn btn-primary" (click)="openModalWithInvoice(invoice)">Open Modal</button></td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+<!-- Modal HTML Yapısı (Bootstrap) -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Invoice Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Invoice Details Here...</p>
+                {{currentInvoice?.id}}
+                {{currentInvoice?.customerId}}
+                {{currentInvoice?.invoiceNumber}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
