@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { tap, switchMap } from 'rxjs/operators';
 import { JwtRefreshToken } from '../../../core/models/auth/jwtRefreshToken.model';
 import { ResponseModel } from '../../../core/models/shared/response.model';
+import { Router } from '@angular/router';
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +14,11 @@ export class AuthService {
     private refreshTokenKey = 'refreshToken';
     private expiresInKey = 'expiresIn';
 
-    constructor(private http: HttpClient) { }
+    private isUserLoggedInSubject = new BehaviorSubject<boolean>(this.checkLoginStatus());
+
+    constructor(private http: HttpClient,
+        private router: Router
+    ) { }
 
     getAccessToken(): string | null {
         return localStorage.getItem(this.accessTokenKey);
@@ -43,25 +48,41 @@ export class AuthService {
                     this.setRefreshToken(response.data.refreshToken);
                 }
             }),
-            switchMap(response => of(response.data?.accessToken ?? '') )
+            switchMap(response => of(response.data?.accessToken ?? ''))
         );
     }
 
-    logout(): void {
+    logout() {
         localStorage.removeItem(this.accessTokenKey);
         localStorage.removeItem(this.refreshTokenKey);
         localStorage.removeItem(this.expiresInKey);
+
+        this.isUserLoggedInSubject.next(false);
+
+        console.log('❌ Kullanıcı çıkış yaptı');
+
+        this.router.navigate(['/auth/login']);
     }
 
-    isLogin(): boolean {
-        let accessToken = this.getAccessToken();
+    login(accesstoken: string, refreshToken: string, expiresIn: number) {
+        this.setAccessToken(accesstoken);
+        this.setRefreshToken(refreshToken);
+        localStorage.setItem('expiresIn', expiresIn.toString());
 
-        if(accessToken == null)
-            return false;
+        this.isUserLoggedInSubject.next(true);
 
-        return true;
+        console.log('✅ Kullanıcı giriş yaptı');
+
+        this.router.navigate(['/invoice']);
     }
 
+    private checkLoginStatus(): boolean {
+        return this.getAccessToken() !== null;
+    }
+
+    isUserLogin$(): Observable<boolean> {
+        return this.isUserLoggedInSubject.asObservable();
+    }
     //   isTokenValid(): boolean {
     //     const token = this.getToken();
     //     if (!token) return false;

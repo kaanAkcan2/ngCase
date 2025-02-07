@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiHttpService } from '../../../../core/services/apiHttp.service';
 import { JwtRefreshToken } from '../../../../core/models/auth/jwtRefreshToken.model';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +16,7 @@ export class LoginComponent {
 
   constructor(private router: Router,
     private apiHttpService: ApiHttpService,
+    private authService: AuthService
   ) { }
 
   onSubmit() {
@@ -26,11 +28,9 @@ export class LoginComponent {
     this.apiHttpService.post<JwtRefreshToken>("auth/login", dataToPost)
       .subscribe(
         (data) => {
-          localStorage.setItem('accessToken', data.accessToken);
-          localStorage.setItem('refreshToken', data.refreshToken);
-          localStorage.setItem('expiresIn', data.expiresIn.toString());
+          this.authService.login(data.accessToken,data.refreshToken,data.expiresIn)
 
-          this.router.navigate(['/invoice']);
+          
         },
         (error) => alert('Geçersiz kullanıcı adı veya şifre')
       );

@@ -1,31 +1,39 @@
-<h1>Index Invoice</h1>
+<div class="d-flex flex-column gap-5">
+    <h1>Index Invoice</h1>
+
+    <div class="d-flex justify-content-end bg-$indigo-100">
+        <button class="btn btn-primary" (click)="openModalWithoutInvoice()">Open Modal</button>
+    </div>
 
 
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th scope="col">Customer ID</th>
-            <th scope="col">Invoice Number</th>
-            <th scope="col">Invoice Date</th>
-            <th scope="col">Total Amount</th>
-            <th scope="col">User ID</th>
-            <th scope="col">Record Date</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let invoice of invoices">
-            <td>{{ invoice.customerId }}</td>
-            <td>{{ invoice.invoiceNumber }}</td>
-            <td>{{ invoice.invoiceDate | date: 'short' }}</td>
-            <td>{{ invoice?.totalAmount | currency }}</td>
-            <td>{{ invoice.userId }}</td>
-            <td>{{ invoice.recordDate | date: 'short' }}</td>
-            <td><button class="btn btn-primary" (click)="openModalWithInvoice(invoice)">Open Modal</button></td>
-        </tr>
-    </tbody>
-</table>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Customer ID</th>
+                <th scope="col">Invoice Number</th>
+                <th scope="col">Invoice Date</th>
+                <th scope="col">Total Amount</th>
+                <th scope="col">User ID</th>
+                <th scope="col">Record Date</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let invoice of invoices">
+                <td>{{ invoice.customerId }}</td>
+                <td>{{ invoice.invoiceNumber }}</td>
+                <td>{{ invoice.invoiceDate | date: 'short' }}</td>
+                <td>{{ invoice?.totalAmount | currency }}</td>
+                <td>{{ invoice.userId }}</td>
+                <td>{{ invoice.recordDate | date: 'short' }}</td>
+                <td><button class="btn btn-primary" (click)="openModalWithInvoice(invoice)">Open Modal</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
 
 
 
@@ -38,14 +46,72 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Invoice Details Here...</p>
-                {{currentInvoice?.id}}
-                {{currentInvoice?.customerId}}
-                {{currentInvoice?.invoiceNumber}}
+                <h2>Invoice Create/Update</h2>
+                <form (ngSubmit)="onSubmit()" class="d-flex flex-column">
+                    <div class="d-flex justify-content-between gap-3">
+                        <div class="mb-3">
+                            <label for="customerId" class="form-label">customerId</label>
+                            <input type="text" id="customerId" [(ngModel)]="currentInvoice.customerId" name="customerId" placeholder="Enter Guid string"
+                                class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userId" class="form-label">userId</label>
+                            <input type="text" id="userId" [(ngModel)]="currentInvoice.userId" name="userId" placeholder="Enter Guid string"
+                                class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between gap-3">
+                        <div class="mb-3">
+                            <label for="invoiceNumber" class="form-label">invoiceNumber</label>
+                            <input type="number" id="invoiceNumber" [(ngModel)]="currentInvoice.invoiceNumber"
+                                name="invoiceNumber" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="totalAmount" class="form-label">userId</label>
+                            <input type="number" id="totalAmount" [(ngModel)]="currentInvoice.totalAmount"
+                                name="totalAmount" class="form-control" required>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group mb-3">
+                            <label for="invoiceDate" class="form-label">invoiceDate</label>
+                            <input type="date" class="form-control form-control-lg" id="invoiceDate" name="invoiceDate"
+                                [(ngModel)]="currentInvoice.invoiceDate">
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column border p-3 bg-light shadow-sm rounded">
+                        <h3>New InvoiceLine</h3>
+                        <div class="d-flex justify-content-between gap-3">
+                            <div class="mb-3">
+                                <label for="itemName" class="form-label">itemName</label>
+                                <input type="text" id="itemName" [(ngModel)]="currentInvoiceLine.itemName" name="itemName"
+                                    class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="userId" class="form-label">userId</label>
+                                <input type="text" id="userId" [(ngModel)]="currentInvoiceLine.userId" name="userId" placeholder="Enter Guid string"
+                                    class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between gap-3">
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">quantity</label>
+                                <input type="number" id="quantity" [(ngModel)]="currentInvoiceLine.quantity"
+                                    name="quantity" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="price" class="form-label">price</label>
+                                <input type="number" id="price" [(ngModel)]="currentInvoiceLine.price"
+                                    name="price" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="submit" class="btn btn-primary" (click)="onSubmit()">Save changes</button>
             </div>
         </div>
     </div>

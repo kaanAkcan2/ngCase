@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-end">
     
-    <a *ngIf="isUserLogin" class="navbar-brand" routerLink="/" (click)="logout()">Çıkış Yap</a>
+    <a *ngIf="isUserLogin$ | async" class="navbar-brand" routerLink="/" (click)="logout()">Çıkış Yap</a>
 </nav>
 <div class="container mt-4">
     <router-outlet></router-outlet>

@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Invoice } from '../../../../core/models/invoice/invoice.model';
 import { ApiHttpService } from '../../../../core/services/apiHttp.service';
+import { InvoiceLine } from '../../../../core/models/invoice/invoiceLine.model';
 
 declare var bootstrap: any;
 @Component({
@@ -38,14 +39,27 @@ export class IndexComponent {
         },
         // Diğer faturalara da benzer şekilde ekleme yapılabilir
     ];
-    currentInvoice: Invoice | null = null;
+
+    newInvoiceObject: Invoice = {
+        invoiceDate:new Date(),
+        customerId: '',
+        userId: '',
+    };
+
+    newInvoiceLineObject : InvoiceLine = {
+        recordDate: new Date(),
+    }
+
+    currentInvoice: Invoice = {...this.newInvoiceObject};
+
+    currentInvoiceLine: InvoiceLine = {...this.newInvoiceLineObject};
 
     modalInstance: any;
 
-    ngAfterViewInit(): void {
+    ngOnInit(): void {
 
         const modalElement = document.getElementById('exampleModal');
-        this.modalInstance = new bootstrap.Modal(modalElement); 
+        this.modalInstance = new bootstrap.Modal(modalElement);
 
         let dataToPost = { startDate: null, endDate: null };
 
@@ -65,9 +79,24 @@ export class IndexComponent {
         }
     }
 
+    openModalWithoutInvoice() {
+        if (this.modalInstance) {
+            this.currentInvoice = {...this.newInvoiceObject};
+            this.modalInstance.show(); // Modal'ı açıyoruz
+        }
+    }
+
     closeModal() {
         if (this.modalInstance) {
             this.modalInstance.hide(); // Modal'ı kapatıyoruz
+        }
+    }
+
+    onSubmit() {
+        console.log(this.currentInvoice);
+
+        if (this.modalInstance) {
+            this.modalInstance.hide();
         }
     }
 }
