@@ -71,8 +71,8 @@ export class IndexComponent {
 
         this.getList();
 
-        if(this.currentInvoice.customer == null || this.currentInvoice.customer == undefined){
-            this.currentInvoice.customer = this.newCustomerObject;
+        if(this.newInvoiceObject.customer == null || this.newInvoiceObject.customer == undefined){
+            this.newInvoiceObject.customer = this.newCustomerObject;
         }
     }
 
