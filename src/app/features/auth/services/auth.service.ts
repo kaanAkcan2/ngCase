@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { tap, switchMap } from 'rxjs/operators';
 import { JwtRefreshToken } from '../../../core/models/auth/jwtRefreshToken.model';
 import { ResponseModel } from '../../../core/models/shared/response.model';
@@ -11,6 +11,7 @@ import { ResponseModel } from '../../../core/models/shared/response.model';
 export class AuthService {
     private accessTokenKey = 'accessToken';
     private refreshTokenKey = 'refreshToken';
+    private expiresInKey = 'expiresIn';
 
     constructor(private http: HttpClient) { }
 
@@ -35,7 +36,7 @@ export class AuthService {
         const accessToken = this.getAccessToken();
         if (!refreshToken) return of('');
 
-        return this.http.post<ResponseModel<JwtRefreshToken>>('/api/auth/ValidateTokenAsync', { refreshToken, accessToken }).pipe(
+        return this.http.post<ResponseModel<JwtRefreshToken>>('/api/v1/auth/validate', { refreshToken, accessToken }).pipe(
             tap(response => {
                 if (response.data) {
                     this.setAccessToken(response.data.accessToken);
@@ -49,6 +50,16 @@ export class AuthService {
     logout(): void {
         localStorage.removeItem(this.accessTokenKey);
         localStorage.removeItem(this.refreshTokenKey);
+        localStorage.removeItem(this.expiresInKey);
+    }
+
+    isLogin(): boolean {
+        let accessToken = this.getAccessToken();
+
+        if(accessToken == null)
+            return false;
+
+        return true;
     }
 
     //   isTokenValid(): boolean {

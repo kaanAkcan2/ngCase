@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Invoice } from '../../../../core/models/invoice/invoice.model';
+import { ApiHttpService } from '../../../../core/services/apiHttp.service';
 
 declare var bootstrap: any;
 @Component({
@@ -10,6 +11,10 @@ declare var bootstrap: any;
     standalone: false
 })
 export class IndexComponent {
+
+    constructor(
+        private apiHttpService: ApiHttpService,
+    ) { }
 
     currency: string = "tl";
     invoices: Invoice[] = [
@@ -35,13 +40,22 @@ export class IndexComponent {
     ];
     currentInvoice: Invoice | null = null;
 
-
     modalInstance: any;
 
     ngAfterViewInit(): void {
 
         const modalElement = document.getElementById('exampleModal');
-        this.modalInstance = new bootstrap.Modal(modalElement); // Bootstrap modal instance'ını oluşturuyoruz.
+        this.modalInstance = new bootstrap.Modal(modalElement); 
+
+        let dataToPost = { startDate: null, endDate: null };
+
+        this.apiHttpService.post<Invoice[]>("invoice/get-invoice-list", dataToPost)
+            .subscribe(
+                (data) => {
+                    this.invoices = data;
+                },
+                (error) => console.log('List getirilmedi')
+            );
     }
 
     openModalWithInvoice(invoice: Invoice) {
