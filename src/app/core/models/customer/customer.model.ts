@@ -1,11 +1,11 @@
 export interface Customer {
-    id: String;
-    taxNumber: String;
-    title: String;
-    address: String;
-    eMail: String;
-    userId: String;
-    recordDate: Date;
+    id?: string;
+    taxNumber?: string;
+    title?: string;
+    address?: string;
+    eMail?: string;
+    userId?: string;
+    recordDate?: Date;
 }
 
 export type Customers = Customer[];

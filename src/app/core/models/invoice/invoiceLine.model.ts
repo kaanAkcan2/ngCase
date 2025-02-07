@@ -1,9 +1,9 @@
 export interface InvoiceLine {
-    id?: String;
-    itemName?: String;
-    quantity?: Number;
-    price?: Number;
-    userId?: String;
+    id?: string;
+    itemName?: string;
+    quantity?: number;
+    price?: number;
+    userId?: string;
     recordDate?: Date;    
 }
 
