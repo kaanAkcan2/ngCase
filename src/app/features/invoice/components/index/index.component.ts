@@ -4,6 +4,7 @@ import { Invoice } from '../../../../core/models/invoice/invoice.model';
 import { ApiHttpService } from '../../../../core/services/apiHttp.service';
 import { InvoiceLine } from '../../../../core/models/invoice/invoiceLine.model';
 import { Customer } from '../../../../core/models/customer/customer.model';
+import { BehaviorSubject, catchError, filter, map, Observable, of, switchMap, tap } from 'rxjs';
 
 declare var bootstrap: any;
 @Component({
@@ -14,13 +15,13 @@ declare var bootstrap: any;
 })
 export class IndexComponent {
 
-    constructor(private router : Router,
+    constructor(private router: Router,
         private apiHttpService: ApiHttpService,
     ) { }
 
     currency: string = "tl";
 
-    isUpdate : boolean = false;
+    isUpdate: boolean = false;
 
     invoices: Invoice[] = [
         {
@@ -45,22 +46,22 @@ export class IndexComponent {
     ];
 
     newInvoiceObject: Invoice = {
-        invoiceDate:new Date(),
+        invoiceDate: new Date(),
         userId: '88888888-8888-8888-8888-888888888888',
     };
 
-    newInvoiceLineObject : InvoiceLine = {
+    newInvoiceLineObject: InvoiceLine = {
         recordDate: new Date(),
         userId: '88888888-8888-8888-8888-888888888888',
     }
 
-    newCustomerObject : Customer = {
-        recordDate : new Date(),
+    newCustomerObject: Customer = {
+        recordDate: new Date(),
     };
 
-    currentInvoice: Invoice = {...this.newInvoiceObject};
+    currentInvoice: Invoice = { ...this.newInvoiceObject };
 
-    currentInvoiceLine: InvoiceLine = {...this.newInvoiceLineObject};
+    currentInvoiceLine: InvoiceLine = { ...this.newInvoiceLineObject };
 
     modalInstance: any;
 
@@ -71,12 +72,14 @@ export class IndexComponent {
 
         this.getList();
 
-        if(this.newInvoiceObject.customer == null || this.newInvoiceObject.customer == undefined){
+        if (this.newInvoiceObject.customer == null || this.newInvoiceObject.customer == undefined) {
             this.newInvoiceObject.customer = this.newCustomerObject;
         }
+
+        this.InvoiceLListSubject.next([]);
     }
 
-    getList(){
+    getList() {
         let dataToPost = { startDate: null, endDate: null };
 
         this.apiHttpService.post<Invoice[]>("invoice/get-invoice-list", dataToPost)
@@ -89,7 +92,7 @@ export class IndexComponent {
     }
 
     openModalWithInvoice(invoice: Invoice) {
-        this.isUpdate =true;
+        this.isUpdate = true;
 
         if (this.modalInstance) {
             this.currentInvoice = invoice;
@@ -98,10 +101,10 @@ export class IndexComponent {
     }
 
     openModalWithoutInvoice() {
-        this.isUpdate =false;
+        this.isUpdate = false;
 
         if (this.modalInstance) {
-            this.currentInvoice = {...this.newInvoiceObject};
+            this.currentInvoice = { ...this.newInvoiceObject };
             this.modalInstance.show(); // Modal'ı açıyoruz
         }
     }
@@ -117,51 +120,82 @@ export class IndexComponent {
 
         let dataToPost = { ...this.currentInvoice };
 
-        if(this.isUpdate){
+        this.InvoiceLListSubject.next([]);
+        
+        if (this.isUpdate) {
             this.apiHttpService.put<Invoice[]>("invoice", dataToPost)
-            .subscribe(
-                (data) => {
-                    this.router.navigate(['/invoice']);
-                },
-                (error) => console.log('List getirilmedi')
-            );
-        }else{
+                .subscribe(
+                    (data) => {
+                        this.router.navigate(['/invoice']);
+                    },
+                    (error) => console.log('List getirilmedi')
+                );
+        } else {
             this.apiHttpService.post<Invoice[]>("invoice", dataToPost)
-            .subscribe(
-                (data) => {
-                    this.router.navigate(['/invoice']);
-                },
-                (error) => console.log('List getirilmedi')
-            );
+                .subscribe(
+                    (data) => {
+                        this.router.navigate(['/invoice']);
+                    },
+                    (error) => console.log('List getirilmedi')
+                );
         }
 
-        
-
+       
         if (this.modalInstance) {
             this.modalInstance.hide();
         }
     }
 
-    deleteInvoice (invoice : Invoice){
-        this.apiHttpService.delete<Invoice>("invoice?id="+ invoice.id )
-        .subscribe(
-            (data) => {
-                this.router.navigate(['/invoice']);
-            },
-            (error) => console.log('List getirilmedi')
-        );
+    deleteInvoice(invoice: Invoice) {
+        this.apiHttpService.delete<Invoice>("invoice?id=" + invoice.id)
+            .subscribe(
+                (data) => {
+                    this.router.navigate(['/invoice']);
+                },
+                (error) => console.log('List getirilmedi')
+            );
     }
 
-    addInvoiceLine(){
+    addInvoiceLine() {
         console.log(this.currentInvoiceLine);
 
-        if(this.currentInvoice.invoiceLines == undefined || this.currentInvoice.invoiceLines == null || this.currentInvoice.invoiceLines.length < 1 )
-            this.currentInvoice.invoiceLines =  [{...this.currentInvoiceLine}];
+        if (this.currentInvoice.invoiceLines == undefined || this.currentInvoice.invoiceLines == null || this.currentInvoice.invoiceLines.length < 1)
+            this.currentInvoice.invoiceLines = [{ ...this.currentInvoiceLine }];
         else
-            this.currentInvoice.invoiceLines.push({...this.currentInvoiceLine});
+            this.currentInvoice.invoiceLines.push({ ...this.currentInvoiceLine });
 
-        this.currentInvoiceLine = {...this.newInvoiceLineObject };   
+        this.currentInvoiceLine = { ...this.newInvoiceLineObject };
 
         console.log(this.currentInvoice);
+    }
+
+    private InvoiceLListSubject = new BehaviorSubject<Invoice[]>([]);
+
+    private getInvoiceList(): any {
+
+    }
+
+    InvoiceList$(): Observable<any> {
+        return this.InvoiceLListSubject.asObservable()
+            .pipe(
+                filter(Boolean),
+                switchMap(x => {
+
+
+                    let dataToPost = { startDate: null, endDate: null };
+
+                    return this.apiHttpService.post<any>("invoice/get-invoice-list", dataToPost)
+                        .pipe(
+                            filter(Boolean),
+                            tap(x => {
+                                this.invoices = x.data;
+                            })
+
+
+                        );
+
+
+                }),
+            );
     }
 }
